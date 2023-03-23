@@ -1,10 +1,10 @@
 const Pool = require("pg").Pool;
 
 const pool = new Pool({
-  user: "brandongottshall",
+  user: "postgres",
   host: "localhost",
   database: "contacts",
-  password: "",
+  password: "123",
   port: 5432,
 });
 
@@ -55,7 +55,56 @@ const postContacts = (req, res) => {
 };
 
 // PUTs
+const updateContact = (req,res) =>{
+  let {name, email_address, age, id} = req.body;
+  // Use a promise to request the existing data
+  let myPromise = new Promise(function(resolve,reject){
+    pool.query("SELECT * FROM people WHERE id=$1", [id], (error,results)=>{
+      if(error){
+        throw error
+      } else if (res){
+        // if an item doesn't have given data, set it with the existing data.
+        name = name !== undefined ? name : results.rows.name;
+        email_address = email_address !== undefined ? email_address : results.rows.email_address;
+        age = age !== undefined ? age : results.rows.age;
+        resolve(results.rows)
+        return results.rows
+      } else {
+        reject()
+      }
+    })
+  })
+  myPromise.then(()=>{
+    try{
+      
+      pool.query('UPDATE people SET name=$1, email_address=$2, age=$3 WHERE id = $4', 
+      [name, email_address, age, id],
+      (error,results)=>{
+        console.log(results)
+        if(error){
+          throw error;
+        }
+        res.status(201).json(results.rows);
+      })
+    }
+    catch(error){
+      throw error;
+    }
+  })
+}
+
+
 // DELETEs
+const deleteContact = (request, response)=>{
+  const id=parseInt(request.params.id);
+  pool.query(`DELETE FROM people WHERE id = ${id}`, (error, results)=>{
+    if(error){
+      throw error;
+    }
+    response.status(200).json(results.rows);
+  })
+}
+
 module.exports = {
   get: {
     contacts: getContacts,
@@ -64,6 +113,12 @@ module.exports = {
   post: {
     contacts: postContacts,
   },
+  delete: {
+    contact: deleteContact
+  },
+  update: {
+    contact: updateContact
+  }
 };
 
 

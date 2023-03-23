@@ -1,3 +1,5 @@
+const cors = require('cors');
+
 // Import express
 const express = require('express');
 
@@ -8,10 +10,11 @@ const db = require('./queries');
 const app = express();
 
 // Set the port to 3001
-const port = 3001;
+const port = 3000;
 
 // Use the express json middleware
 app.use(express.json());
+app.use(cors());
 
 // Create a route for the root of the app
 app.get('/', (req, res) => {
@@ -30,6 +33,12 @@ app.get('/contact/:id', db.get.contact);
 
 // POSTs
 app.post('/contacts', db.post.contacts);
+
+//Deletes
+app.delete("/contact/:id", db.delete.contact)
+
+//PUTs
+app.put('/contacts', db.update.contact);
 
 // Start the server
 app.listen(port, () => {

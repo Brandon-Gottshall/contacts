@@ -24,8 +24,9 @@ app.get('/', (req, res) => {
 // GET /contacts
 app.get('/contacts', db.get.contacts);
 
-// GET /emails
-app.get('/emails', db.get.emails);
+// GET /contacts/:id
+app.get('/contact/:id', db.get.contact);
+
 
 // POSTs
 app.post('/contacts', db.post.contacts);

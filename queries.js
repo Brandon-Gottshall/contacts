@@ -20,6 +20,21 @@ const getContacts = (req, res) => {
     }
   });
 };
+
+// GET /contacts/:id
+const getContact = (req, res) => {
+  const id = parseInt(req.params.id);
+  pool.query( "SELECT * FROM people WHERE id = $1", [id], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500);
+    } else {
+      res.status(200).json(results.rows);
+    }
+  })
+};
+
+
 // POSTs
 // POST /contacts
 const postContacts = (req, res) => {
@@ -33,7 +48,7 @@ const postContacts = (req, res) => {
         console.error(error);
         res.status(500);
       } else {
-        res.status(201).json(results.rows)
+        res.status(201).send('Success!')
       }
     }
   );
@@ -44,7 +59,7 @@ const postContacts = (req, res) => {
 module.exports = {
   get: {
     contacts: getContacts,
-    emails: getEmails
+    contact: getContact
   },
   post: {
     contacts: postContacts,
